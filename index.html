@@ -156,7 +156,7 @@
         }
 
         function recordChoice(choice) {
-            const siteName = images[currentImageIndex].replace('./IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
+            const siteName = images[currentImageIndex].replace('IMAGES', '').replace(/\.(png|jpg|jpeg)$/i, '');
             choices.push(`${siteName}: ${choice}`);
             if (currentImageIndex + 1 < images.length) {
                 currentImageIndex++;
