@@ -122,36 +122,14 @@
     </div>
 
     <script>
-        let images = [];
-
-        // Fetch image names from the IMAGES folder dynamically
-        async function fetchImages() {
-            try {
-                const response = await fetch('./IMAGES/');
-                if (!response.ok) throw new Error('Failed to load images');
-
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = doc.querySelectorAll('a');
-
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    if (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg')) {
-                        images.push(`./IMAGES/${href}`);
-                    }
-                });
-
-                if (images.length > 0) {
-                    startExperiment();
-                } else {
-                    alert('No images found in the IMAGES folder');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Failed to load images dynamically.');
-            }
-        }
+        const images = [
+            'cookie-consent-simulation2/IMAGES/youtube.png',
+            'cookie-consent-simulation2/IMAGES/gov.png',
+            'cookie-consent-simulation2/IMAGES/ali.png',
+            'cookie-consent-simulation2/IMAGES/yad2.png',
+            'cookie-consent-simulation2/IMAGES/bl.png',
+            'cookie-consent-simulation2/IMAGES/clalit.png'
+        ];
 
         let currentImageIndex = 0;
         const imageContainer = document.getElementById('image-container');
@@ -178,7 +156,7 @@
         }
 
         function recordChoice(choice) {
-            const siteName = images[currentImageIndex].replace('./IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
+            const siteName = images[currentImageIndex].replace('cookie-consent-simulation2/IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
             choices.push(`${siteName}: ${choice}`);
             if (currentImageIndex + 1 < images.length) {
                 currentImageIndex++;
@@ -226,9 +204,6 @@
                 console.error('Error:', error);
             });
         }
-
-        // Initialize and fetch images
-        fetchImages();
     </script>
 </body>
 </html>
