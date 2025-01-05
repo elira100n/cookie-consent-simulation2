@@ -122,14 +122,36 @@
     </div>
 
     <script>
-        const images = [
-            'youtube.png',
-            'gov.png',
-            'ali.png',
-            'yad2.png',
-            'bl.png',
-            'clalit.png'
-        ];
+        let images = [];
+
+        // Fetch image names from the IMAGES folder dynamically
+        async function fetchImages() {
+            try {
+                const response = await fetch('./IMAGES/');
+                if (!response.ok) throw new Error('Failed to load images');
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = doc.querySelectorAll('a');
+
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg')) {
+                        images.push(`./IMAGES/${href}`);
+                    }
+                });
+
+                if (images.length > 0) {
+                    startExperiment();
+                } else {
+                    alert('No images found in the IMAGES folder');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Failed to load images dynamically.');
+            }
+        }
 
         let currentImageIndex = 0;
         const imageContainer = document.getElementById('image-container');
@@ -156,7 +178,7 @@
         }
 
         function recordChoice(choice) {
-            const siteName = images[currentImageIndex].replace('.png', '');
+            const siteName = images[currentImageIndex].replace('./IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
             choices.push(`${siteName}: ${choice}`);
             if (currentImageIndex + 1 < images.length) {
                 currentImageIndex++;
@@ -188,7 +210,7 @@
                 choices: choices
             };
 
-            fetch('https://docs.google.com/spreadsheets/d/10-FUoQ8jRtttZk-if0x-jUm8ntrQhdoHmnFBA8O57lE/edit?gid=0#gid=0', {
+            fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -204,6 +226,9 @@
                 console.error('Error:', error);
             });
         }
+
+        // Initialize and fetch images
+        fetchImages();
     </script>
 </body>
 </html>
