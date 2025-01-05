@@ -123,12 +123,12 @@
 
     <script>
         const images = [
-            'cookie-consent-simulation2/IMAGES/youtube.png',
-            'cookie-consent-simulation2/IMAGES/gov.png',
-            'cookie-consent-simulation2/IMAGES/ali.png',
-            'cookie-consent-simulation2/IMAGES/yad2.png',
-            'cookie-consent-simulation2/IMAGES/bl.png',
-            'cookie-consent-simulation2/IMAGES/clalit.png'
+            'youtube.png',
+            'gov.png',
+            'ali.png',
+            'yad2.png',
+            'bl.png',
+            'clalit.png'
         ];
 
         let currentImageIndex = 0;
@@ -156,7 +156,7 @@
         }
 
         function recordChoice(choice) {
-            const siteName = images[currentImageIndex].replace('cookie-consent-simulation2/IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
+            const siteName = images[currentImageIndex].replace('./IMAGES/', '').replace(/\.(png|jpg|jpeg)$/i, '');
             choices.push(`${siteName}: ${choice}`);
             if (currentImageIndex + 1 < images.length) {
                 currentImageIndex++;
