@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Consent Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .popup {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .popup h3 {
+            margin: 0 0 10px;
+        }
+
+        .popup button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button.accept {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .popup button.decline {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-screen h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .welcome-screen p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen input {
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .welcome-screen button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-screen" id="welcome-screen">
+            <h1>ברוכים הבאים למחקר בנושא בחירת עוגיות</h1>
+            <p>אנא הזן את שמך כדי להתחיל:</p>
+            <input type="text" id="participant-name" placeholder="הזן את שמך כאן">
+            <br>
+            <button onclick="startExperiment()">התחל את הניסוי</button>
+        </div>
+        <div class="image-container" id="image-container"></div>
+        <div class="popup" id="popup" style="display: none;">
+            <h3>אתר זה משתמש בעוגיות</h3>
+            <p>אנא בחר האם לאשר או לדחות את השימוש בעוגיות.</p>
+            <button class="accept" onclick="recordChoice('אושר')">אישור</button>
+            <button class="decline" onclick="recordChoice('נדחה')">דחייה</button>
+        </div>
+    </div>
+
+    <script>
+        const images = [
+            'youtube.png',
+            'gov.png',
+            'ali.png',
+            'yad2.png',
+            'bl.png',
+            'clalit.png'
+        ];
+
+        let currentImageIndex = 0;
+        const imageContainer = document.getElementById('image-container');
+        const popup = document.getElementById('popup');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const participantNameInput = document.getElementById('participant-name');
+        const choices = [];
+        let participantName = "";
+
+        function startExperiment() {
+            participantName = participantNameInput.value.trim();
+            if (!participantName) {
+                alert('אנא הזן את שמך כדי להתחיל.');
+                return;
+            }
+            welcomeScreen.style.display = 'none';
+            imageContainer.style.display = 'block';
+            popup.style.display = 'block';
+            updateImage();
+        }
+
+        function updateImage() {
+            imageContainer.style.backgroundImage = `url('${images[currentImageIndex]}')`;
+        }
+
+        function recordChoice(choice) {
+            const siteName = images[currentImageIndex].replace('.png', '');
+            choices.push(`${siteName}: ${choice}`);
+            if (currentImageIndex + 1 < images.length) {
+                currentImageIndex++;
+                updateImage();
+            } else {
+                showDownloadOption();
+                sendToGoogleSheet();
+            }
+        }
+
+        function showDownloadOption() {
+            popup.innerHTML = `
+                <h3>תודה על הבחירות שלך, ${participantName}!</h3>
+                <button onclick="downloadChoices()">הורד את התוצאות</button>
+            `;
+        }
+
+        function downloadChoices() {
+            const blob = new Blob([choices.join('\n')], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${participantName}_cookie_choices.txt`;
+            link.click();
+        }
+
+        function sendToGoogleSheet() {
+            const data = {
+                name: participantName,
+                choices: choices
+            };
+
+            fetch('https://docs.google.com/spreadsheets/d/10-FUoQ8jRtttZk-if0x-jUm8ntrQhdoHmnFBA8O57lE/edit?gid=0#gid=0', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Data sent successfully');
+                } else {
+                    console.error('Failed to send data');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
