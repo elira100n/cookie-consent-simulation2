@@ -123,12 +123,16 @@
 
     <script>
         const images = [
-            'youtube.png',
-            'gov.png',
-            'ali.png',
-            'yad2.png',
-            'bl.png',
-            'clalit.png'
+            './clalit.png',
+            './youtube.png',
+            './gov.png',
+            './ali.png',
+            './yad2.png',
+            './bl.png',
+            './facebook.png',
+            './mako.png',
+            './el.png',
+            './tel-aviv.png'
         ];
 
         let currentImageIndex = 0;
@@ -156,7 +160,7 @@
         }
 
         function recordChoice(choice) {
-            const siteName = images[currentImageIndex].replace('IMAGES', '').replace(/\.(png|jpg|jpeg)$/i, '');
+            const siteName = images[currentImageIndex].replace('./', '').replace(/\.(png|jpg|jpeg)$/i, '');
             choices.push(`${siteName}: ${choice}`);
             if (currentImageIndex + 1 < images.length) {
                 currentImageIndex++;
